@@ -136,6 +136,7 @@ def display_databases():
 
 if __name__ == '__main__':
     #create_databases()
+    '''
     add_gallery_image('static/images/amazon_law.jpg','Amazon Law','this is a description of amazon law')
     add_gallery_image('static/images/change_happens_fast.jpg', 'Change Happens Fast', 'this is a description of change happens fast')
     add_gallery_image('static/images/law_on_demand.jpg', 'Law On Demand', 'this is a description of law on demand')
@@ -145,6 +146,7 @@ if __name__ == '__main__':
     add_behaviour('persistent')
     add_behaviour('optimistic')
     add_behaviour('tech-savvy')
+    '''
     display_databases()
 
     # Example usage:
