@@ -36,7 +36,8 @@ def index():
     cursor.execute("SELECT PathToImage FROM Gallery")
     images = cursor.fetchall()
     conn.close()
-    print(images)
+    for image in images:
+        print(images[0][0])
     return render_template('index.html', images=images)  # Tell
 
 

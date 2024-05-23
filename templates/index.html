@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
-
+{% block content %}
 {% for image_path in images %}
-<p>test</p>
-    <img src="{{ url_for('static', filename=image_path[0]) }}" alt="Gallery Image">
+    <img src="{{ url_for('static', filename=image_path[0]) }}" alt={{image_path[0]}}>
 {% endfor %}
+{% endblock %}

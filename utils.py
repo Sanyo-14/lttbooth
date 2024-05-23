@@ -11,8 +11,17 @@ def calculate_elo(player_a_elo, player_b_elo, result):
     Returns:
         tuple: New ELO ratings for player A and player B.
     """
-    # (Implement ELO calculation logic here)
-    pass
+    k_factor = 32  # You can adjust the K-factor as needed
+
+    # Calculate expected scores
+    expected_a = 1 / (1 + 10 ** ((player_b_elo - player_a_elo) / 400))
+    expected_b = 1 / (1 + 10 ** ((player_a_elo - player_b_elo) / 400))
+
+    # Calculate new ELO ratings
+    new_elo_a = round(player_a_elo + k_factor * (result - expected_a))
+    new_elo_b = round(player_b_elo + k_factor * ((1 - result) - expected_b))
+
+    return new_elo_a, new_elo_b
 
 
 def create_databases():
@@ -133,22 +142,140 @@ def display_databases():
 
     conn.close()
 
+def update_gallery_elo_wins(name, new_elo, new_wins):
+    """Updates the ELO and Wins for a gallery image."""
+    conn = sqlite3.connect('treehouse.db')
+    cursor = conn.cursor()
+    try:
+        cursor.execute("UPDATE Gallery SET ELO = ?, Wins = ? WHERE Name = ?",
+                       (new_elo, new_wins, name))
+        conn.commit()
+        print(f"Gallery image '{name}' updated successfully!")
+    except Exception as e:
+        print(f"Error updating gallery image '{name}': {e}")
+    finally:
+        conn.close()
+
+
+def update_behaviour_elo_wins(name, new_elo, new_wins):
+    """Updates the ELO and Wins for a behaviour."""
+    conn = sqlite3.connect('treehouse.db')
+    cursor = conn.cursor()
+    try:
+        cursor.execute("UPDATE Behaviour SET ELO = ?, Wins = ? WHERE name = ?",
+                       (new_elo, new_wins, name))
+        conn.commit()
+        print(f"Behaviour '{name}' updated successfully!")
+    except Exception as e:
+        print(f"Error updating behaviour '{name}': {e}")
+    finally:
+        conn.close()
+
+def get_gallery_elo_wins(name):
+    """Retrieves the ELO and Wins for a gallery image.
+
+    Args:
+        name (str): The name of the gallery image.
+
+    Returns:
+        tuple: A tuple containing the ELO and Wins (ELO, Wins) or None if the image is not found.
+    """
+    conn = sqlite3.connect('treehouse.db')
+    cursor = conn.cursor()
+    try:
+        cursor.execute("SELECT ELO, Wins FROM Gallery WHERE Name = ?", (name,))
+        result = cursor.fetchone()
+        return result if result else None
+    except Exception as e:
+        print(f"Error retrieving data for gallery image '{name}': {e}")
+        return None
+    finally:
+        conn.close()
+
+
+def get_behaviour_elo_wins(name):
+    """Retrieves the ELO and Wins for a behaviour.
+
+    Args:
+        name (str): The name of the behaviour.
+
+    Returns:
+        tuple: A tuple containing the ELO and Wins (ELO, Wins) or None if the behaviour is not found.
+    """
+    conn = sqlite3.connect('treehouse.db')
+    cursor = conn.cursor()
+    try:
+        cursor.execute("SELECT ELO, Wins FROM Behaviour WHERE name = ?", (name,))
+        result = cursor.fetchone()
+        return result if result else None
+    except Exception as e:
+        print(f"Error retrieving data for behaviour '{name}': {e}")
+        return None
+    finally:
+        conn.close()
+
+def get_gallery_leaderboard(limit=10):
+    """Returns a leaderboard of gallery images sorted by ELO.
+
+    Args:
+        limit (int, optional): The maximum number of entries to return.
+                             Defaults to 10.
+
+    Returns:
+        list: A list of lists, where each inner list represents a gallery image
+              and its data in the format [PathToImage, Name, ELO, Wins].
+    """
+    conn = sqlite3.connect('treehouse.db')
+    cursor = conn.cursor()
+    try:
+        cursor.execute("SELECT PathToImage, Name, ELO, Wins FROM Gallery ORDER BY ELO DESC LIMIT ?", (limit,))
+        leaderboard = cursor.fetchall()
+        return leaderboard
+    except Exception as e:
+        print(f"Error retrieving gallery leaderboard: {e}")
+        return []
+    finally:
+        conn.close()
+
+
+def get_behaviour_leaderboard(limit=10):
+    """Returns a leaderboard of behaviours sorted by ELO.
+
+    Args:
+        limit (int, optional): The maximum number of entries to return.
+                             Defaults to 10.
+
+    Returns:
+        list: A list of lists, where each inner list represents a behaviour
+              and its data in the format [name, ELO, Wins].
+    """
+    conn = sqlite3.connect('treehouse.db')
+    cursor = conn.cursor()
+    try:
+        cursor.execute("SELECT name, ELO, Wins FROM Behaviour ORDER BY ELO DESC LIMIT ?", (limit,))
+        leaderboard = cursor.fetchall()
+        return leaderboard
+    except Exception as e:
+        print(f"Error retrieving behaviour leaderboard: {e}")
+        return []
+    finally:
+        conn.close()
 
 if __name__ == '__main__':
-    #create_databases()
-    '''
-    add_gallery_image('static/images/amazon_law.jpg','Amazon Law','this is a description of amazon law')
-    add_gallery_image('static/images/change_happens_fast.jpg', 'Change Happens Fast', 'this is a description of change happens fast')
-    add_gallery_image('static/images/law_on_demand.jpg', 'Law On Demand', 'this is a description of law on demand')
-    add_gallery_image('static/images/the_source_of_truth.jpg', 'The Source Of Truth', 'this is a description of the source of truth')
+    '''create_databases()
+
+    add_gallery_image('images/amazon_law.jpg','Amazon Law','this is a description of amazon law')
+    add_gallery_image('images/change_happens_fast.jpg', 'Change Happens Fast', 'this is a description of change happens fast')
+    add_gallery_image('images/law_on_demand.jpg', 'Law On Demand', 'this is a description of law on demand')
+    add_gallery_image('images/the_source_of_truth.jpg', 'The Source Of Truth', 'this is a description of the source of truth')
     add_comment('Amazon Law', 'this is the future!')
     add_behaviour('agile')
     add_behaviour('persistent')
     add_behaviour('optimistic')
     add_behaviour('tech-savvy')
-    '''
+'''
     display_databases()
-
+    print(get_behaviour_leaderboard())
     # Example usage:
     # add_behaviour("Smiling", elo=1250, wins=5)
     # add_gallery_image("images/photo1.jpg", "Courtroom Scene", "A dramatic courtroom scene.")
