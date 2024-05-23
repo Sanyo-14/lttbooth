@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Gallery</h1>
+    <div class="grid">
+        {% for image in images %}
+            <a href="{{ url_for('gallery_description', image_name=image.name) }}">
+                <img src="{{ url_for('static', filename='images/' + image.path) }}" alt="{{ image.name }}">
+            </a>
+        {% endfor %}
+    </div>
+{% endblock %}
