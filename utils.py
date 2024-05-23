@@ -261,6 +261,41 @@ def get_behaviour_leaderboard(limit=10):
     finally:
         conn.close()
 
+def get_random_items(table_name, num_items=2):
+    """Retrieves random items (images or behaviours) from the specified table.
+
+    Args:
+        table_name (str): The name of the table to retrieve items from
+                          ('Gallery' for images, 'Behaviour' for behaviours).
+        num_items (int, optional): The number of random items to retrieve.
+                                  Defaults to 2.
+
+    Returns:
+        list: A list of random items.
+              - If table_name is 'Gallery', each item is a list:
+                [PathToImage, Name, Description]
+              - If table_name is 'Behaviour', each item is a string (behaviour name).
+              Returns an empty list if there's an error or no items found.
+    """
+
+    conn = sqlite3.connect('treehouse.db')
+    cursor = conn.cursor()
+    try:
+        if table_name == 'Gallery':
+            cursor.execute(f"SELECT PathToImage, Name, Description FROM Gallery ORDER BY RANDOM() LIMIT {num_items}")
+            return cursor.fetchall()
+        elif table_name == 'Behaviour':
+            cursor.execute(f"SELECT name FROM Behaviour ORDER BY RANDOM() LIMIT {num_items}")
+            return [row[0] for row in cursor.fetchall()]  # Extract names from tuples
+        else:
+            print(f"Invalid table name: {table_name}")
+            return []
+    except Exception as e:
+        print(f"Error retrieving random items from {table_name}: {e}")
+        return []
+    finally:
+        conn.close()
+
 if __name__ == '__main__':
     '''create_databases()
 
@@ -275,7 +310,7 @@ if __name__ == '__main__':
     add_behaviour('tech-savvy')
 '''
     display_databases()
-    print(get_behaviour_leaderboard())
+    #print(get_random_items('Gallery'))
     # Example usage:
     # add_behaviour("Smiling", elo=1250, wins=5)
     # add_gallery_image("images/photo1.jpg", "Courtroom Scene", "A dramatic courtroom scene.")
