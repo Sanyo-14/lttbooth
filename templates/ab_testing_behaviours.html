@@ -2,20 +2,35 @@
 
 {% block content %}
     <h1>A/B Testing Behaviours</h1>
-    <p>Implementation for comparing and selecting the best performing behaviours will go here.</p>
 
-    <h3>Add New Behaviour</h3>
-    <form method="POST" action="">
-        {{ form.hidden_tag() }}
-        <div>
-            {{ form.name.label }}<br>
-            {{ form.name }}
-            {% for error in form.name.errors %}
-                <span style="color: red;">{{ error }}</span>
-            {% endfor %}
-        </div>
-        <div>
-            {{ form.submit() }}
-        </div>
-    </form>
+    <h2>Compare Behaviors</h2>
+    <p>Choose the behavior you think is more aligned with the Treehouse vision:</p>
+
+    <div id="ab-testing-section">
+        <h2>{{ behaviour1 }} vs. {{ behaviour2 }}</h2>
+        <form method="POST" action="">
+            <button type="submit" name="choice" value="behaviour1">{{ behaviour1 }}</button>
+            <button type="submit" name="choice" value="behaviour2">{{ behaviour2 }}</button>
+        </form>
+    </div>
+
+    <hr> <!-- A horizontal rule to separate the sections visually -->
+
+    <h2>Add New Behaviour</h2>
+    <div id="add-behavior-section">
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <div>
+                {{ form.name.label }}<br>
+                {{ form.name }}
+                {% for error in form.name.errors %}
+                    <span style="color: red;">{{ error }}</span>
+                {% endfor %}
+            </div>
+            <div>
+                <button type="submit" name="action" value="add_behavior">Add Behaviour</button>
+            </div>
+        </form>
+    </div>
+
 {% endblock %}

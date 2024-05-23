@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Behaviour Leaderboard</h1>
-    <p>Implementation for displaying the behaviour leaderboard will go here.</p>
+    <h2>Behaviour Leaderboard</h2>
+    <ul>
+        {% for behaviour in leaderboard %}
+            <li>{{ behaviour[0] }} - ELO: {{ behaviour[1] }}, Wins: {{ behaviour[2] }}</li>
+        {% endfor %}
+    </ul>
 {% endblock %}

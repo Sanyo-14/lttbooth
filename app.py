@@ -1,33 +1,20 @@
 from flask import Flask
 
 from forms import CommentForm, AddBehaviourForm
-
-'''
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-
-from dotenv import load_dotenv
-load_dotenv()
-basedir = os.path.abspath(os.path.dirname(__file__))
-'''
-
-
-#db = SQLAlchemy(app)
-#Migrate(app, db)
-
 import sqlite3
 import os
-from flask import render_template, url_for, flash, redirect, app
+from flask import render_template, url_for, flash, redirect, app, request
 
-from utils import create_databases, add_comment, add_behaviour
+from utils import create_databases, add_comment, add_behaviour, update_gallery_elo_wins, update_behaviour_elo_wins, \
+    get_gallery_elo_wins, get_behaviour_elo_wins, get_gallery_leaderboard, get_behaviour_leaderboard, get_random_items, \
+    calculate_elo
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.sqlite')
-#app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Ensure databases are ready when the app starts
 create_databases()
+
 
 @app.route('/')
 def index():
@@ -65,32 +52,91 @@ def gallery_description(image_id):
     return render_template('gallery_description.html', image=image, comments=comments, form=form)
 
 
-@app.route('/ab_testing_images')
+@app.route('/ab_testing_images', methods=['GET', 'POST'])
 def ab_testing_images():
-    # (Logic for A/B testing images will go here)
-    return render_template('ab_testing_images.html')
+    item1, item2 = get_random_items('Gallery')
+    if request.method == 'POST':
+        choice = request.form['choice']
+
+        # Retrieve current ELO and Wins from the database
+        item1_elo, item1_wins = get_gallery_elo_wins(item1[1])  # Assuming item1[1] is the name
+        item2_elo, item2_wins = get_gallery_elo_wins(item2[1])  # Assuming item2[1] is the name
+
+        if choice == 'item1':
+            item1_wins += 1
+            result = 1  # Item 1 won
+        else:
+            item2_wins += 1
+            result = 0  # Item 2 won
+
+        # Update ELO scores
+        item1_new_elo, item2_new_elo = calculate_elo(item1_elo, item2_elo, result)
+
+        # Update the database
+        update_gallery_elo_wins(item1[1], item1_new_elo, item1_wins)
+        update_gallery_elo_wins(item2[1], item2_new_elo, item2_wins)
+
+        flash('ELO ratings updated!', 'success')
+        return redirect(url_for('ab_testing_images'))
+
+    return render_template('ab_testing_images.html', item1=item1, item2=item2)
 
 
 @app.route('/gallery_leaderboard')
 def gallery_leaderboard():
-    # (Logic for gallery leaderboard will go here)
-    return render_template('gallery_leaderboard.html')
+    leaderboard = get_gallery_leaderboard()
+    return render_template('gallery_leaderboard.html', leaderboard=leaderboard)
 
 
 @app.route('/ab_testing_behaviours', methods=['GET', 'POST'])
 def ab_testing_behaviours():
     form = AddBehaviourForm()
-    if form.validate_on_submit():
-        add_behaviour(form.name.data)
-        flash('Behaviour added!', 'success')
-        return redirect(url_for('ab_testing_behaviours'))
-    return render_template('ab_testing_behaviours.html', form=form)
+    behaviour1, behaviour2 = get_random_items('Behaviour')
+
+    if request.method == 'POST':
+        if 'choice' in request.form:
+            # Handle A/B testing choice
+            choice = request.form['choice']
+
+            # Get ELO and Wins from the database for both behaviours
+            behaviour1_elo, behaviour1_wins = get_behaviour_elo_wins(behaviour1)
+            behaviour2_elo, behaviour2_wins = get_behaviour_elo_wins(behaviour2)
+
+            if choice == 'behaviour1':
+                behaviour1_wins += 1
+                result = 1  # Behaviour 1 won
+            else:
+                behaviour2_wins += 1
+                result = 0  # Behaviour 2 won
+
+            # Calculate the new ELO scores
+            behaviour1_new_elo, behaviour2_new_elo = calculate_elo(behaviour1_elo, behaviour2_elo, result)
+
+            # Update the database with the new ELO scores and win counts
+            update_behaviour_elo_wins(behaviour1, behaviour1_new_elo, behaviour1_wins)
+            update_behaviour_elo_wins(behaviour2, behaviour2_new_elo, behaviour2_wins)
+
+            flash('ELO ratings updated!', 'success')
+            return redirect(url_for('ab_testing_behaviours'))
+
+        elif 'action' in request.form and request.form['action'] == 'add_behavior':
+            # Handle new behavior form submission
+            if form.validate_on_submit():
+                add_behaviour(form.name.data)
+                flash('Behaviour added!', 'success')
+                return redirect(url_for('ab_testing_behaviours'))
+
+    return render_template('ab_testing_behaviours.html',
+                           behaviour1=behaviour1,
+                           behaviour2=behaviour2,
+                           form=form)
 
 
 @app.route('/behaviour_leaderboard')
 def behaviour_leaderboard():
-    # (Logic for behaviour leaderboard will go here)
-    return render_template('behaviour_leaderboard.html')
+    leaderboard = get_behaviour_leaderboard()
+    return render_template('behaviour_leaderboard.html', leaderboard=leaderboard)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
