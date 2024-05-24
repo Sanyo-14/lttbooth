@@ -15,11 +15,7 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 # Ensure databases are ready when the app starts
 create_databases()
 
-available_image_paths = [
-    'images/amazon_law.jpg',
-    'images/change_happens_fast.jpg',
-    'images/law_on_demand.jpg'
-]
+
 @app.route('/')
 def index():
     conn = sqlite3.connect('treehouse.db')
@@ -79,8 +75,7 @@ def ab_testing_images():
 
     return render_template('ab_testing_images.html',
                            item1=item1,
-                           item2=item2,
-                           available_image_paths=available_image_paths)
+                           item2=item2)
 
 @app.route('/ab_testing_images_choose/<choice>')
 def ab_testing_images_choose(choice):
