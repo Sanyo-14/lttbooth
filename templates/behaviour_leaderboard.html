@@ -2,9 +2,25 @@
 
 {% block content %}
     <h2>Behaviour Leaderboard</h2>
-    <ul>
-        {% for behaviour in leaderboard %}
-            <li>{{ behaviour[0] }} - ELO: {{ behaviour[1] }}, Wins: {{ behaviour[2] }}</li>
-        {% endfor %}
-    </ul>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>ELO</th>
+                <th>Wins</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for behaviour in leaderboard %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ behaviour[0] }}</td>
+                    <td>{{ behaviour[1] }}</td>
+                    <td>{{ behaviour[2] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

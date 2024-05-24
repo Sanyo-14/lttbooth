@@ -1,0 +1,17 @@
+/* static/style.css */
+
+/* Optional: Basic card styling from Bootstrap */
+.card {
+    border: none; /* Remove default card border */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+}
+
+.card-img-top {
+    border-radius: 0; /* Remove rounded corners from the top */
+}
+
+/* Responsive images */
+.img-fluid {
+    max-width: 100%;
+    height: auto;
+}

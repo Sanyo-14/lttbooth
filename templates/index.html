@@ -1,6 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
-{% for image_path in images %}
-    <img src="{{ url_for('static', filename=image_path[0]) }}" alt={{image_path[0]}}>
-{% endfor %}
+    <div class="container">
+        <div class="row">
+            {% for image in images %}
+                <div class="col-md-4 mb-4">
+                    <a href="{{ url_for('gallery_description', image_id=image[0]) }}">
+                        <div class="card">
+                            <img src="{{ url_for('static', filename=image[1]) }}" class="card-img-top" alt="{{ image[1] }}">
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 {% endblock %}

@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 
 from forms import CommentForm, AddBehaviourForm
 import sqlite3
@@ -20,12 +20,10 @@ create_databases()
 def index():
     conn = sqlite3.connect('treehouse.db')
     cursor = conn.cursor()
-    cursor.execute("SELECT PathToImage FROM Gallery")
+    cursor.execute("SELECT id, PathToImage FROM Gallery") # Select both id and PathToImage
     images = cursor.fetchall()
     conn.close()
-    for image in images:
-        print(images[0][0])
-    return render_template('index.html', images=images)  # Tell
+    return render_template('index.html', images=images) 
 
 
 @app.route('/gallery/<image_id>', methods=['GET', 'POST'])
@@ -52,34 +50,36 @@ def gallery_description(image_id):
     return render_template('gallery_description.html', image=image, comments=comments, form=form)
 
 
-@app.route('/ab_testing_images', methods=['GET', 'POST'])
+@app.route('/ab_testing_images')
 def ab_testing_images():
     item1, item2 = get_random_items('Gallery')
-    if request.method == 'POST':
-        choice = request.form['choice']
-
-        # Retrieve current ELO and Wins from the database
-        item1_elo, item1_wins = get_gallery_elo_wins(item1[1])  # Assuming item1[1] is the name
-        item2_elo, item2_wins = get_gallery_elo_wins(item2[1])  # Assuming item2[1] is the name
-
-        if choice == 'item1':
-            item1_wins += 1
-            result = 1  # Item 1 won
-        else:
-            item2_wins += 1
-            result = 0  # Item 2 won
-
-        # Update ELO scores
-        item1_new_elo, item2_new_elo = calculate_elo(item1_elo, item2_elo, result)
-
-        # Update the database
-        update_gallery_elo_wins(item1[1], item1_new_elo, item1_wins)
-        update_gallery_elo_wins(item2[1], item2_new_elo, item2_wins)
-
-        flash('ELO ratings updated!', 'success')
-        return redirect(url_for('ab_testing_images'))
-
     return render_template('ab_testing_images.html', item1=item1, item2=item2)
+
+@app.route('/ab_testing_images_choose/<choice>')
+def ab_testing_images_choose(choice):
+    item1_name = request.args.get('item1_name')
+    item2_name = request.args.get('item2_name')
+
+    # Retrieve data using functions from utils.py
+    item1_elo, item1_wins = get_gallery_elo_wins(item1_name)
+    item2_elo, item2_wins = get_gallery_elo_wins(item2_name)
+
+    # Determine winner and update wins
+    if choice == 'item1':
+        item1_wins += 1
+        result = 1
+    else:
+        item2_wins += 1
+        result = 0
+
+    # Calculate new ELO scores
+    item1_new_elo, item2_new_elo = calculate_elo(item1_elo, item2_elo, result)
+
+    # Update database using functions from utils.py
+    update_gallery_elo_wins(item1_name, item1_new_elo, item1_wins)
+    update_gallery_elo_wins(item2_name, item2_new_elo, item2_wins)
+
+    return redirect(url_for('ab_testing_images'))
 
 
 @app.route('/gallery_leaderboard')

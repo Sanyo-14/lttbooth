@@ -2,5 +2,32 @@
 
 {% block content %}
     <h1>Gallery Leaderboard</h1>
-    <p>Implementation for displaying the gallery leaderboard will go here.</p>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Image</th>
+                <th>Name</th>
+                <th>ELO</th>
+                <th>Wins</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in leaderboard %}
+                <tr>
+                    <td>{{ loop.index }}</td> {# Use loop.index for the rank #}
+                    <td>
+                        <img src="{{ url_for('static', filename=item[0]) }}"
+                             alt="{{ item[1] }}"
+                             class="img-fluid"
+                             style="max-width: 100px;">
+                    </td>
+                    <td>{{ item[1] }}</td>
+                    <td>{{ item[2] }}</td>
+                    <td>{{ item[3] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

@@ -2,5 +2,22 @@
 
 {% block content %}
     <h1>A/B Testing Images</h1>
-    <p>Implementation for comparing and selecting the best performing images will go here.</p>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 text-center mb-4">
+                <a href="{{ url_for('ab_testing_images_choose', choice='item1', item1_name=item1[1], item2_name=item2[1]) }}" class="card">
+                    <img src="{{ url_for('static', filename=item1[0]) }}" alt="{{ item1[1] }}" class="card-img-top img-fluid">
+                </a>
+                <p>{{ item1[2] }}</p>
+            </div>
+
+            <div class="col-md-6 text-center mb-4">
+                <a href="{{ url_for('ab_testing_images_choose', choice='item2', item1_name=item1[1], item2_name=item2[1]) }}" class="card">
+                    <img src="{{ url_for('static', filename=item2[0]) }}" alt="{{ item2[1] }}" class="card-img-top img-fluid">
+                </a>
+                <p>{{ item2[2] }}</p>
+            </div>
+        </div>
+    </div>
 {% endblock %}
