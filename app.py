@@ -62,6 +62,7 @@ def ab_testing_images():
         #selected_image_path = request.form.get('image_path')
         name = request.form.get('name')
         description = request.form.get('description')
+        flash('Image being generated, please dont refresh the page', 'success')
         try:
             description_full, specific_elements, additional_details, file_path, database_path = generate_image_details(name,description)
             generate_and_save_image(name, description_full, specific_elements, additional_details,

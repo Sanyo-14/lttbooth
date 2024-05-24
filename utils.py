@@ -47,7 +47,7 @@ def create_databases():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS Gallery (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            PathToImage TEXT NOT NULL,
+            PathToImage TEXT NOT NULL UNIQUE,
             Name TEXT NOT NULL,
             Description TEXT,
             ELO INTEGER DEFAULT 1000,
@@ -93,8 +93,8 @@ def add_gallery_image(path, name, description, elo=1000, wins=0):
                        (path, name, description, elo, wins))
         conn.commit()
         print(f"Gallery image '{name}' added successfully!")
-    #except sqlite3.IntegrityError:
-        #print(f"Error: Gallery image with path '{path}' or name '{name}' already exists.")
+    except sqlite3.IntegrityError:
+        print(f"Error: Gallery image with path '{path}' or name '{name}' already exists.")
     finally:
         conn.close()
 
@@ -395,12 +395,7 @@ if __name__ == '__main__':
     add_behaviour('tech-savvy')'''
 
     #display_databases()
-    name = "netflix law"
-    description = "on demand feed of documents on all your devices at home"
-    description_full, specific_elements, additional_details, file_path, database_path = generate_image_details(name,
-                                                                                                               description)
-    generate_and_save_image(name, description_full, specific_elements, additional_details,
-                            file_path)
+
     #print(get_random_items('Gallery'))
     # Example usage:
     # add_behaviour("Smiling", elo=1250, wins=5)
