@@ -7,7 +7,7 @@ from flask import render_template, url_for, flash, redirect, app, request
 
 from utils import create_databases, add_comment, add_behaviour, update_gallery_elo_wins, update_behaviour_elo_wins, \
     get_gallery_elo_wins, get_behaviour_elo_wins, get_gallery_leaderboard, get_behaviour_leaderboard, get_random_items, \
-    calculate_elo, add_gallery_image
+    calculate_elo, add_gallery_image, generate_image_details,generate_and_save_image
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
@@ -59,17 +59,22 @@ def ab_testing_images():
     item1, item2 = get_random_items('Gallery')
 
     if request.method == 'POST':
-        selected_image_path = request.form.get('image_path')
+        #selected_image_path = request.form.get('image_path')
         name = request.form.get('name')
         description = request.form.get('description')
-
-        if selected_image_path and name and description:
-            try:
-                add_gallery_image(selected_image_path, name, description)
-                flash('Image added successfully!', 'success')
-            except Exception as e:
-                flash(f'Error adding image: {str(e)}', 'error')
-            return redirect(url_for('ab_testing_images'))
+        try:
+            description_full, specific_elements, additional_details, file_path, database_path = generate_image_details(name,description)
+            generate_and_save_image(name, description_full, specific_elements, additional_details,
+                                    file_path)
+            if database_path and name and description_full:
+                try:
+                    add_gallery_image(database_path, name, description_full)
+                    flash('Image added successfully!', 'success')
+                except Exception as e:
+                    flash(f'Error adding image: {str(e)}', 'error')
+                return redirect(url_for('ab_testing_images'))
+        except Exception as e:
+            flash(f'Error adding image: {str(e)}', 'error')
 
     return render_template('ab_testing_images.html',
                            item1=item1,

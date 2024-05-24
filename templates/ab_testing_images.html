@@ -22,14 +22,6 @@
     <hr>
     <h2>Add New Image</h2>
     <form method="POST" action="">
-        <div>
-            <label for="image_path">Select Image:</label>
-            <select name="image_path" id="image_path" class="form-control">
-                {% for path in available_image_paths %}
-                    <option value="{{ path }}">{{ path }}</option>
-                {% endfor %}
-            </select>
-        </div>
 
         <div>
             <label for="name">Name:</label>

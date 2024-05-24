@@ -307,11 +307,7 @@ client = OpenAI(api_key='sk-proj-iqIenJ2D7p99oMUc5wj4T3BlbkFJE5U3pmE8PquPiTcAt4v
 # Set your OpenAI API key here
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
-prompt_template = """                                                                                                        
-A detailed cartoon image in a black and white style with red accents. The image is titled "{title}" and portrays {description
-The scene should include specific elements such as {specific_elements} and additional details like {additional_details}.     
-The overall composition should maintain a satirical and humorous tone, similar to the style of an old newspaper/cartoon.     
-"""
+
 
 
 def generate_and_save_image(title, description, specific_elements, additional_details, output_image_path):
@@ -325,12 +321,8 @@ def generate_and_save_image(title, description, specific_elements, additional_de
         output_image_path (str): The path to save the generated image.
     """
 
-    prompt = prompt_template.format(
-        title=title,
-        description=description,
-        specific_elements=specific_elements,
-        additional_details=additional_details
-    )
+    prompt = f'A detailed cartoon image in a black and white style with red accents. The image is titled "{title}" and portrays {description} The scene should include specific elements such as {specific_elements} and additional details like {additional_details}. The overall composition should maintain a satirical and humorous tone, similar to the style of an old newspaper/cartoon.'
+
 
     response = client.images.generate(
         model="dall-e-3",
@@ -402,7 +394,13 @@ if __name__ == '__main__':
     add_behaviour('optimistic')
     add_behaviour('tech-savvy')'''
 
-    display_databases()
+    #display_databases()
+    name = "netflix law"
+    description = "on demand feed of documents on all your devices at home"
+    description_full, specific_elements, additional_details, file_path, database_path = generate_image_details(name,
+                                                                                                               description)
+    generate_and_save_image(name, description_full, specific_elements, additional_details,
+                            file_path)
     #print(get_random_items('Gallery'))
     # Example usage:
     # add_behaviour("Smiling", elo=1250, wins=5)
