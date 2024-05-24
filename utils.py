@@ -42,7 +42,7 @@ def create_databases():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS Gallery (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            PathToImage TEXT NOT NULL UNIQUE,
+            PathToImage TEXT NOT NULL,
             Name TEXT NOT NULL,
             Description TEXT,
             ELO INTEGER DEFAULT 1000,
@@ -88,8 +88,8 @@ def add_gallery_image(path, name, description, elo=1000, wins=0):
                        (path, name, description, elo, wins))
         conn.commit()
         print(f"Gallery image '{name}' added successfully!")
-    except sqlite3.IntegrityError:
-        print(f"Error: Gallery image with path '{path}' or name '{name}' already exists.")
+    #except sqlite3.IntegrityError:
+        #print(f"Error: Gallery image with path '{path}' or name '{name}' already exists.")
     finally:
         conn.close()
 
@@ -307,8 +307,8 @@ if __name__ == '__main__':
     add_behaviour('agile')
     add_behaviour('persistent')
     add_behaviour('optimistic')
-    add_behaviour('tech-savvy')
-'''
+    add_behaviour('tech-savvy')'''
+
     display_databases()
     #print(get_random_items('Gallery'))
     # Example usage:

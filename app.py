@@ -7,7 +7,7 @@ from flask import render_template, url_for, flash, redirect, app, request
 
 from utils import create_databases, add_comment, add_behaviour, update_gallery_elo_wins, update_behaviour_elo_wins, \
     get_gallery_elo_wins, get_behaviour_elo_wins, get_gallery_leaderboard, get_behaviour_leaderboard, get_random_items, \
-    calculate_elo
+    calculate_elo, add_gallery_image
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
@@ -15,7 +15,11 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 # Ensure databases are ready when the app starts
 create_databases()
 
-
+available_image_paths = [
+    'images/amazon_law.jpg',
+    'images/change_happens_fast.jpg',
+    'images/law_on_demand.jpg'
+]
 @app.route('/')
 def index():
     conn = sqlite3.connect('treehouse.db')
@@ -23,7 +27,7 @@ def index():
     cursor.execute("SELECT id, PathToImage FROM Gallery") # Select both id and PathToImage
     images = cursor.fetchall()
     conn.close()
-    return render_template('index.html', images=images) 
+    return render_template('index.html', images=images)
 
 
 @app.route('/gallery/<image_id>', methods=['GET', 'POST'])
@@ -50,10 +54,27 @@ def gallery_description(image_id):
     return render_template('gallery_description.html', image=image, comments=comments, form=form)
 
 
-@app.route('/ab_testing_images')
+@app.route('/ab_testing_images', methods=['GET', 'POST'])
 def ab_testing_images():
     item1, item2 = get_random_items('Gallery')
-    return render_template('ab_testing_images.html', item1=item1, item2=item2)
+
+    if request.method == 'POST':
+        selected_image_path = request.form.get('image_path')
+        name = request.form.get('name')
+        description = request.form.get('description')
+
+        if selected_image_path and name and description:
+            try:
+                add_gallery_image(selected_image_path, name, description)
+                flash('Image added successfully!', 'success')
+            except Exception as e:
+                flash(f'Error adding image: {str(e)}', 'error')
+            return redirect(url_for('ab_testing_images'))
+
+    return render_template('ab_testing_images.html',
+                           item1=item1,
+                           item2=item2,
+                           available_image_paths=available_image_paths)
 
 @app.route('/ab_testing_images_choose/<choice>')
 def ab_testing_images_choose(choice):

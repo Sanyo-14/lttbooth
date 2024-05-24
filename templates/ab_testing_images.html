@@ -2,7 +2,6 @@
 
 {% block content %}
     <h1>A/B Testing Images</h1>
-
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-6 text-center mb-4">
@@ -20,4 +19,26 @@
             </div>
         </div>
     </div>
+    <hr>
+    <h2>Add New Image</h2>
+    <form method="POST" action="">
+        <div>
+            <label for="image_path">Select Image:</label>
+            <select name="image_path" id="image_path" class="form-control">
+                {% for path in available_image_paths %}
+                    <option value="{{ path }}">{{ path }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label for="name">Name:</label>
+            <input type="text" name="name" id="name" class="form-control" required>
+        </div>
+        <div>
+            <label for="description">Description:</label>
+            <textarea name="description" id="description" class="form-control"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Add Image</button>
+    </form>
 {% endblock %}
