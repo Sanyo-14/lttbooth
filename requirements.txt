@@ -4,3 +4,6 @@ Flask-WTF
 Flask-Migrate
 python-dotenv~=1.0.1
 WTForms~=3.1.2
+openai~=1.30.2
+requests~=2.32.2
+pillow~=10.3.0
